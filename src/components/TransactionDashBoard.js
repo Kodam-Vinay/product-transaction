@@ -1,5 +1,11 @@
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
 import TransactionTable from "./TransactionTable";
+import useSearchResults from "../hooks/useSearchResults";
+import { useDispatch } from "react-redux";
+import { storeSelectedMonth } from "../utils/storeStatsResultsSlice";
+import TransactionStats from "./TransactionStats";
+import BarChartStats from "./BarChartStats";
+import PieChartUniqueItems from "./PieChartUniqueItems";
 const monthsList = [
   {
     id: 1,
@@ -51,17 +57,30 @@ const monthsList = [
   },
 ];
 const TransactionDashBoard = () => {
+  const dispatch = useDispatch();
   const [searchInput, setSearchInput] = useState("");
   const [selectedMonth, setSelectedMonth] = useState(monthsList[2].month);
+  const [pageNo, setPageNo] = useState(1);
+
   const onHandleMonth = (event) => {
     setSelectedMonth(event.target.value);
   };
   const onHandleSearchInput = (event) => {
     setSearchInput(event.target.value);
   };
-
-  const getData = () => {};
-
+  useSearchResults(searchInput, pageNo);
+  useEffect(() => {
+    const findSelectedMonthNum = monthsList.find(
+      (each) => each?.month === selectedMonth
+    );
+    if (!findSelectedMonthNum) return;
+    dispatch(
+      storeSelectedMonth({
+        monthNum: findSelectedMonthNum?.id,
+        month: findSelectedMonthNum?.month,
+      })
+    );
+  }, [selectedMonth]);
   return (
     <div className="w-full h-full">
       <div className="rounded-full bg-white mx-auto flex flex-col justify-center w-40 h-40 items-center">
@@ -71,12 +90,13 @@ const TransactionDashBoard = () => {
       <div className="flex items-center w-full justify-between px-10 mt-10">
         <input
           type="search"
-          className="px-4 py-2 rounded-lg w-1/4 outline-none"
+          placeholder="Search Transaction"
+          className="px-4 py-2 rounded-lg w-1/4 outline-none bg-[#f8df8c] text-black font-bold"
           onChange={onHandleSearchInput}
           value={searchInput}
         />
         <select
-          className="px-4 py-2 rounded-lg w-1/4 outline-none"
+          className="px-4 py-2 rounded-lg w-1/4 outline-none bg-[#ebb840]"
           onChange={onHandleMonth}
           value={selectedMonth}
         >
@@ -88,6 +108,28 @@ const TransactionDashBoard = () => {
         </select>
       </div>
       <TransactionTable />
+      <div className="px-10 mx-auto w-full flex items-center justify-evenly">
+        <p className="text-lg font-bold">page No: {pageNo}</p>
+        <div className="flex items-center">
+          <button
+            className="font-bold text-lg"
+            onClick={() => pageNo > 1 && setPageNo(pageNo - 1)}
+          >
+            Prev
+          </button>
+          <hr className="w-2 border-black mt-1 mx-2" />
+          <button
+            className="font-bold text-lg"
+            onClick={() => setPageNo(pageNo + 1)}
+          >
+            Next
+          </button>
+        </div>
+        <p className="text-lg font-bold">Per Page: 10</p>
+      </div>
+      <TransactionStats />
+      <BarChartStats />
+      <PieChartUniqueItems />
     </div>
   );
 };
