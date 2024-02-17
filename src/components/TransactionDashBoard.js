@@ -4,8 +4,8 @@ import useSearchResults from "../hooks/useSearchResults";
 import { useDispatch } from "react-redux";
 import { storeSelectedMonth } from "../utils/storeStatsResultsSlice";
 import TransactionStats from "./TransactionStats";
-import BarChartStats from "./BarChartStats";
-import PieChartUniqueItems from "./PieChartUniqueItems";
+import BarChartStatistics from "./BarChartStatistics";
+
 const monthsList = [
   {
     id: 1,
@@ -128,8 +128,14 @@ const TransactionDashBoard = () => {
         <p className="text-lg font-bold">Per Page: 10</p>
       </div>
       <TransactionStats />
-      <BarChartStats />
-      <PieChartUniqueItems />
+      <div>
+        <div className="w-full mx-auto flex flex-col items-center mt-5 pb-10">
+          <h2 className="font-bold mb-5 text-[36px] -ml-44">
+            Bar Chart Stats - {selectedMonth}
+          </h2>
+          <BarChartStatistics />
+        </div>
+      </div>
     </div>
   );
 };
